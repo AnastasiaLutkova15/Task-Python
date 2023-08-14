@@ -1,0 +1,72 @@
+class Note:
+    def __init__(self, id=str(), title="", content="", creation_date=str()):
+        self.id = id
+        self.title = title
+        self.content = content
+        self.creation_date = creation_date
+    def save(self):
+        with open('notes.json', 'a') as file:
+            file.write(f'{self.id}n{self.title}n{self.content}n{self.creation_date}n---n')
+    def read():
+        with open('notes.json', 'r') as file:
+            notes = file.read().split('---')[:-1]
+        return [Note(id, title.strip(), content.strip()) for (title, content) in (note.split('n', 1) for note in notes)]
+    def edit(title, new_content):
+        with open('notes.json', 'r') as file:
+            notes = file.read().split('---')[:-1]
+        edited_notes = []
+        for note in notes:
+            cur_title, new_content = note.split('n', 1)
+            if cur_title.strip() == title.strip():
+                note = f'{cur_title}n{new_content}'
+            edited_notes.append(note.strip())
+        with open('notes.json', 'w') as file:
+            file.write('n---n'.join(edited_notes) + 'n---n')
+    def delete(title):
+        with open('notes.json', 'r') as file:
+            notes = file.read().split('---')[:-1]
+        remained_notes = []
+        for note in notes:
+            cur_title, _ = note.split('n', 1)
+            if cur_title.strip() != title.strip():
+                remained_notes.append(note.strip())
+        with open('notes.json', 'w') as file:
+            file.write('n---n'.join(remained_notes) + 'n---n')
+if __name__ == '__main__':
+    while True:
+        print('Выберите одно из действий: ')
+        print('1. Создать новую заметку')
+        print('2. Редактировать заметку')
+        print('3. Удалить заметку')
+        print('4. Просмотреть заметки')
+        print('5. Выйти')
+        option = input('Номер действия: ')
+        if option == '1':
+            id = input('Порядковый номер: ')
+            title = input('Заголовок: ')
+            content = input('Содержание: ')
+            creation_date = input('Дата создания: ')
+            note = Note(id, title, content, creation_date)
+            note.save()
+            print('Заметка создана')
+        elif option == '2':
+            title = input('Введите заголовок заметки, которую необходимо отредактировать: ')
+            new_content = input('Введите новый текст заметки: ')
+            Note.edit(title, new_content)
+            print('Заметка отредактирована')
+        elif option == '3':
+            title = input('Введите заголовок заметки, которую необходимо удалить: ')
+            Note.delete(title)
+            print('Заметка удалена')
+        elif option == '4':
+            notes = Note.read()
+            if notes:
+                print('Список заметок: ')
+                for i, note in enumerate(notes, 1):
+                    print(f'{i}. {note.title}')
+            else:
+                print('Заметок нет')
+        elif option == '5':
+            break
+        else:
+            print('Неверный номер')
